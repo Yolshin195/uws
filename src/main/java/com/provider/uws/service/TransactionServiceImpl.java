@@ -3,7 +3,12 @@ package com.provider.uws.service;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PerformTransactionServiceImpl implements PerformTransactionService {
+public class TransactionServiceImpl implements TransactionService {
+
+    @Override
+    public void perform() {
+
+    }
 
     private static boolean isValidLuhn(String value) {
         int sum = Character.getNumericValue(value.charAt(value.length() - 1));
