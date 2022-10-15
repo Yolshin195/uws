@@ -8,10 +8,10 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-@Entity
-@Table(name = "uws_user")
 @Getter
 @Setter
+@Entity
+@Table(name = "uws_user")
 public class User extends BaseEntity {
 
     @Column(name = "username")

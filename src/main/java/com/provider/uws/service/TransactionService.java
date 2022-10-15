@@ -1,6 +1,9 @@
 package com.provider.uws.service;
 
+import com.provider.uws.PerformTransactionArguments;
+import com.provider.uws.PerformTransactionResult;
+
 public interface TransactionService {
 
-    void perform();
+    PerformTransactionResult perform(PerformTransactionArguments arguments);
 }

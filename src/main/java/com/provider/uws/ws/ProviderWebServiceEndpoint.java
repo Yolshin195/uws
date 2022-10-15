@@ -28,8 +28,7 @@ public class ProviderWebServiceEndpoint implements ProviderWebService {
 
     @Override
     public PerformTransactionResult performTransaction(PerformTransactionArguments arguments) {
-        transactionService.perform();
-        return null;
+        return transactionService.perform(arguments);
     }
 
     @Override

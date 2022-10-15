@@ -1,20 +1,20 @@
 package com.provider.uws.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
-@Table(name = "transaction")
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "uws_transaction")
 public class Transaction extends BaseEntity {
+    @Column(name = "transaction_id")
+    Long transactionId;
+
     @Column(name = "balance_before_transaction")
     Long balanceBeforeSurgery;
 
@@ -25,8 +25,17 @@ public class Transaction extends BaseEntity {
     Long amount;
 
     @Column(name = "transaction_type")
-    TransactionTypeEnum transactionType;
+    Integer transactionType;
 
     @ManyToOne
+    @JoinColumn(name = "wallet_id")
     Wallet wallet;
+
+    public TransactionTypeEnum getTransactionType() {
+        return TransactionTypeEnum.valueOf(transactionType);
+    }
+
+    public void setTransactionType(TransactionTypeEnum transactionType) {
+        this.transactionType = transactionType.getValue();
+    }
 }

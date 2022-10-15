@@ -12,10 +12,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import org.h2.server.web.WebServlet;
+
 import javax.xml.ws.Endpoint;
 
 @Configuration
 public class ApplicationConfig {
+
+    @Bean
+    public ServletRegistrationBean h2servletRegistration() {
+        ServletRegistrationBean registration = new ServletRegistrationBean(new WebServlet());
+        registration.addUrlMappings("/console/*");
+        return registration;
+    }
 
     @Bean
     public ServletRegistrationBean<CXFServlet> dispatcherServlet() {

@@ -9,10 +9,10 @@ import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@MappedSuperclass
 @Getter
 @Setter
-public class BaseEntity {
+@MappedSuperclass
+public abstract class BaseEntity {
     @Id
     @Column(name = "id")
     UUID id = UUID.randomUUID();

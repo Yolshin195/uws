@@ -1,20 +1,32 @@
 package com.provider.uws.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
-@Table(name = "wallet")
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "uws_wallet")
 public class Wallet extends BaseEntity {
 
+    @Column(name = "virtual_wallet_number")
+    String number;
+
+    @Column(name = "pin")
+    String pin;
+
+    @Column(name = "balance")
+    Long balance;
+
     @ManyToOne
-    User user;
+    @JoinColumn(name = "customer_id")
+    Customer customer;
+
+    @ManyToOne
+    @JoinColumn(name = "provider_id")
+    Provider provider;
 }
