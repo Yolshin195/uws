@@ -3,12 +3,19 @@ package com.provider.uws.service;
 import com.provider.uws.GenericParam;
 import com.provider.uws.PerformTransactionArguments;
 import com.provider.uws.PerformTransactionResult;
+import com.provider.uws.handler.AuthenticationHandler;
+import com.provider.uws.handler.RequestHandler;
 import com.provider.uws.model.*;
+import com.provider.uws.model.mapper.TransactionMapper;
 import com.provider.uws.service.bd.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +23,7 @@ import java.util.Optional;
 public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
-    UserService userService;
+    AuthenticationService authenticationService;
 
     @Autowired
     CustomerService customerService;
@@ -30,6 +37,9 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     TransactionEntityService transactionEntityService;
 
+    @Autowired
+    TransactionMapper transactionMapper;
+
     @Override
     @Transactional
     public PerformTransactionResult perform(PerformTransactionArguments arguments) {
@@ -38,7 +48,7 @@ public class TransactionServiceImpl implements TransactionService {
         Provider provider = null;
         Wallet wallet = null;
 
-        if (!isAuth(arguments.getUsername(), arguments.getPassword())) {
+        if (!authenticationService.check(arguments.getUsername(), arguments.getPassword())) {
             result.setErrorMsg("The username or password you entered is incorrect");
             result.setStatus(401);
             return result;
@@ -54,6 +64,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         List<GenericParam> paramList = arguments.getParameters();
         Optional<GenericParam> phoneOptional = getPhone(paramList);
+        Optional<GenericParam> pinOptional = getPin(paramList);
         if (phoneOptional.isPresent()) {
             Optional<Customer> customerOptional = customerService.findByPhone(
                     phoneOptional.get().getParamValue()
@@ -76,6 +87,12 @@ public class TransactionServiceImpl implements TransactionService {
             wallet = walletOptional.get();
         }
 
+        if (!(pinOptional.isPresent() && wallet.getPin().equals(pinOptional.get().getParamValue()))) {
+            result.setErrorMsg("The pin is incorrect");
+            result.setStatus(401);
+            return result;
+        }
+
         Transaction transaction = Transaction.builder()
                 .wallet(wallet)
                 .transactionId(arguments.getTransactionId())
@@ -83,17 +100,46 @@ public class TransactionServiceImpl implements TransactionService {
                 .balanceBeforeSurgery(wallet.getBalance())
                 .balanceAfterSurgery(wallet.getBalance() + arguments.getAmount())
                 .transactionType(TransactionTypeEnum.CREDIT.getValue())
+                .transactionTime(fromXMLGregorianCalendar(arguments.getTransactionTime()))
+                .timeStamp(LocalDateTime.now())
                 .build();
 
         transaction = transactionEntityService.save(transaction);
 
         wallet.setBalance(transaction.getBalanceAfterSurgery());
 
-        walletService.update(wallet);
+        wallet = walletService.update(wallet);
+
+        GenericParam balance = new GenericParam();
+        balance.setParamKey("balance");
+        balance.setParamValue(wallet.getBalance().toString());
+        result.getParameters().add(balance);
 
         result.setStatus(200);
+        result.setTimeStamp(getTimeStamp());
+        result.setProviderTrnId(transaction.getTransactionId());
 
         return result;
+    }
+
+    private LocalDateTime fromXMLGregorianCalendar(XMLGregorianCalendar xmlGregorianCalendar) {
+        return LocalDateTime.of(
+                xmlGregorianCalendar.getYear(),
+                xmlGregorianCalendar.getMonth(),
+                xmlGregorianCalendar.getDay(),
+                xmlGregorianCalendar.getHour(),
+                xmlGregorianCalendar.getMinute(),
+                xmlGregorianCalendar.getSecond(),
+                xmlGregorianCalendar.getMillisecond()
+        );
+    }
+
+    private XMLGregorianCalendar getTimeStamp() {
+        try {
+            return DatatypeFactory.newInstance().newXMLGregorianCalendar(LocalDateTime.now().toString());
+        } catch (DatatypeConfigurationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Optional<GenericParam> getPhone(List<GenericParam> paramList) {
@@ -102,13 +148,16 @@ public class TransactionServiceImpl implements TransactionService {
                 .findAny();
     }
 
-    private boolean isAuth(String username, String password) {
-        User user = userService.findByUsername(username);
-        if (user != null && user.getActive() && user.getPassword().equals(password)) {
-            return true;
-        }
+    private Optional<GenericParam> getPin(List<GenericParam> paramList) {
+        return paramList.stream()
+                .filter(p -> p.getParamKey().equals("pin"))
+                .findAny();
+    }
 
-        return false;
+    private Optional<GenericParam> getNumber(List<GenericParam> paramList) {
+        return paramList.stream()
+                .filter(p -> p.getParamKey().equals("number"))
+                .findAny();
     }
 
     private static boolean isValidLuhn(String value) {

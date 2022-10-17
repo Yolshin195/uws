@@ -22,4 +22,9 @@ public class WalletServiceImpl extends BaseEntityServiceImpl<Wallet> implements 
     public Optional<Wallet> findByProviderAndCustomer(Provider provider, Customer customer) {
         return repository.findByProviderAndCustomerAndDeleteTsIsNull(provider, customer);
     }
+
+    @Override
+    public Optional<Wallet> findByProviderAndNumber(Provider provider, String number) {
+        return repository.findByProviderAndNumberAndDeleteTsIsNull(provider, number);
+    }
 }

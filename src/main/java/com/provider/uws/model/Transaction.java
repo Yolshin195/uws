@@ -3,6 +3,7 @@ package com.provider.uws.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -12,8 +13,14 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Table(name = "uws_transaction")
 public class Transaction extends BaseEntity {
-    @Column(name = "transaction_id")
+    @Column(name = "transaction_id", unique = true, nullable = false)
     Long transactionId;
+
+    @Column(name = "transaction_time")
+    LocalDateTime transactionTime;
+
+    @Column(name = "time_stamp")
+    LocalDateTime timeStamp;
 
     @Column(name = "balance_before_transaction")
     Long balanceBeforeSurgery;

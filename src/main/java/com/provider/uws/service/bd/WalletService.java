@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface WalletService extends BaseEntityService<Wallet> {
     Optional<Wallet> findByProviderAndCustomer(Provider provider, Customer customer);
+    Optional<Wallet> findByProviderAndNumber(Provider provider, String number);
 }

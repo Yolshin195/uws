@@ -66,16 +66,21 @@ create table uws_transaction (
     create_ts TIMESTAMP,
     version int,
     --
-    transaction_id bigint,
+    transaction_id bigint not null,
     balance_before_transaction bigint,
     balance_after_transaction bigint,
     amount bigint,
     transaction_type int,
+    transaction_time TIMESTAMP,
+    time_stamp TIMESTAMP,
     --
     wallet_id uuid,
     --
     constraint uws_transaction_pk primary key (id)
 );
+
+ALTER TABLE uws_transaction ADD CONSTRAINT uc_uws_transaction_transaction UNIQUE (transaction_id);
+ALTER TABLE uws_transaction ADD CONSTRAINT FK_UWS_TRANSACTION_ON_WALLET FOREIGN KEY (wallet_id) REFERENCES uws_wallet (id);
 
 insert into uws_user (id, delete_ts, update_ts, create_ts, version, username, password, active)
 values ('d9080d12-91aa-4fda-8757-1d911a512453', null, null, CURRENT_TIMESTAMP(), 1, 'user', 'pwd', true);

@@ -22,8 +22,7 @@ public class ProviderWebServiceEndpoint implements ProviderWebService {
 
     @Override
     public GetInformationResult getInformation(GetInformationArguments arguments) {
-        informationService.getInformation();
-        return null;
+        return informationService.getInformation(arguments);
     }
 
     @Override
