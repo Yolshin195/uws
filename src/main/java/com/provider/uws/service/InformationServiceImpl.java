@@ -1,5 +1,6 @@
 package com.provider.uws.service;
 
+import com.provider.uws.GenericArguments;
 import com.provider.uws.GenericParam;
 import com.provider.uws.GetInformationArguments;
 import com.provider.uws.GetInformationResult;
@@ -10,7 +11,9 @@ import com.provider.uws.service.bd.CustomerService;
 import com.provider.uws.service.bd.ProviderService;
 import com.provider.uws.service.bd.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,52 +36,21 @@ public class InformationServiceImpl implements InformationService {
     @Override
     public GetInformationResult getInformation(GetInformationArguments arguments) {
         GetInformationResult result = new GetInformationResult();
-        List<GenericParam> paramList = arguments.getParameters();
-        Customer customer = null;
-        Provider provider = null;
-        Wallet wallet = null;
 
-        if (!authenticationService.check(arguments.getUsername(), arguments.getPassword())) {
-            result.setErrorMsg("The username or password you entered is incorrect");
-            result.setStatus(401);
-            return result;
-        }
+        try {
+            authentication(arguments);
 
-        Optional<Provider> providerOptional = providerService.findByServiceId(arguments.getServiceId());
-        if (providerOptional.isEmpty()) {
-            result.setErrorMsg("Service not found");
-            result.setStatus(400);
-            return result;
-        }
-        provider = providerOptional.get();
-
-        Optional<GenericParam> phoneOptional = getPhone(paramList);
-        Optional<GenericParam> pinOptional = getPin(paramList);
-
-        if (phoneOptional.isPresent()) {
-            Optional<Customer> customerOptional = customerService
-                    .findByPhone(phoneOptional.get().getParamValue());
-
-            if (customerOptional.isEmpty()) {
-                result.setErrorMsg("Customer not found");
-                result.setStatus(400);
-                return result;
+            Wallet wallet;
+            Provider provider = extractProvider(arguments);
+            Optional<GenericParam> phoneOptional = getPhone(arguments.getParameters());
+            if (phoneOptional.isPresent()) {
+                Customer customer = extractCustomer(phoneOptional.get().getParamValue());
+                wallet = extractWallet(provider, customer);
+            } else {
+                wallet = extractWallet(provider, arguments);
             }
-            customer = customerOptional.get();
 
-            Optional<Wallet> walletOptional = walletService.findByProviderAndCustomer(provider, customer);
-            if (walletOptional.isEmpty()) {
-                result.setErrorMsg("Wallet not found");
-                result.setStatus(400);
-                return result;
-            }
-            wallet = walletOptional.get();
-
-            if (!(pinOptional.isPresent() && wallet.getPin().equals(pinOptional.get().getParamValue()))) {
-                result.setErrorMsg("The pin is incorrect");
-                result.setStatus(401);
-                return result;
-            }
+            checkPin(arguments, wallet);
 
             result.setStatus(200);
 
@@ -87,34 +59,12 @@ public class InformationServiceImpl implements InformationService {
             balance.setParamValue(wallet.getBalance().toString());
             result.getParameters().add(balance);
 
-            return result;
-        }
-
-        Optional<GenericParam> numberOptional = getNumber(paramList);
-
-        if (numberOptional.isPresent()) {
-
-            Optional<Wallet> walletOptional = walletService
-                    .findByProviderAndNumber(provider, numberOptional.get().getParamValue());
-            if (walletOptional.isEmpty()) {
-                result.setErrorMsg("Wallet not found");
-                result.setStatus(400);
-                return result;
-            }
-            wallet = walletOptional.get();
-
-            if (!(pinOptional.isPresent() && wallet.getPin().equals(pinOptional.get().getParamValue()))) {
-                result.setErrorMsg("The pin is incorrect");
-                result.setStatus(401);
-                return result;
-            }
-
-            result.setStatus(200);
-
-            GenericParam balance = new GenericParam();
-            balance.setParamKey("balance");
-            balance.setParamValue(wallet.getBalance().toString());
-            result.getParameters().add(balance);
+        } catch (ResponseStatusException e) {
+            result.setStatus(e.getStatus().value());
+            result.setErrorMsg(e.getMessage());
+        } catch (Exception e) {
+            result.setStatus(500);
+            result.setErrorMsg("External error!");
         }
 
         return result;
@@ -136,5 +86,58 @@ public class InformationServiceImpl implements InformationService {
         return paramList.stream()
                 .filter(p -> p.getParamKey().equals("number"))
                 .findAny();
+    }
+
+    private void authentication(GenericArguments arguments) {
+        if (!authenticationService.check(arguments.getUsername(), arguments.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "The username or password you entered is incorrect");
+        }
+    }
+
+    private void checkPin(GetInformationArguments arguments, Wallet wallet) {
+        Optional<GenericParam> pinOptional = getPin(arguments.getParameters());
+
+        if (!(pinOptional.isPresent() && wallet.getPin().equals(pinOptional.get().getParamValue()))) {
+            throw  new ResponseStatusException(HttpStatus.UNAUTHORIZED, "The pin is incorrect");
+        }
+    }
+
+    private Provider extractProvider(GetInformationArguments arguments) {
+        Optional<Provider> providerOptional = providerService.findByServiceId(arguments.getServiceId());
+        if (providerOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Service not found");
+        }
+        return providerOptional.get();
+    }
+
+    private Customer extractCustomer(String phone) {
+        Optional<Customer> customerOptional = customerService
+                .findByPhone(phone);
+        if (customerOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Customer not found");
+        }
+        return customerOptional.get();
+    }
+
+    private Wallet extractWallet(Provider provider, Customer customer) {
+        Optional<Wallet> walletOptional = walletService.findByProviderAndCustomer(provider, customer);
+        if (walletOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wallet not found");
+        }
+        return walletOptional.get();
+    }
+
+    private Wallet extractWallet(Provider provider, GetInformationArguments arguments) {
+        Optional<GenericParam> numberOptional = getNumber(arguments.getParameters());
+        if (numberOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Number not found");
+        }
+
+        Optional<Wallet> walletOptional = walletService
+                .findByProviderAndNumber(provider, numberOptional.get().getParamValue());
+        if (walletOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wallet not found");
+        }
+        return walletOptional.get();
     }
 }
