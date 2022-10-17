@@ -49,7 +49,6 @@ public class TransactionServiceImpl implements TransactionService {
             Provider provider = extractProvider(arguments.getServiceId());
             List<GenericParam> paramList = arguments.getParameters();
             Optional<GenericParam> phoneOptional = getPhone(paramList);
-            Optional<GenericParam> pinOptional = getPin(paramList);
             if (phoneOptional.isPresent()) {
                 Customer customer = extractCustomer(phoneOptional.get().getParamValue());
                 wallet = extractWallet(provider, customer);
