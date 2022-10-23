@@ -27,6 +27,9 @@ public class ExtractFieldServiceImpl implements ExtractFieldService {
     @Autowired
     WalletService walletService;
 
+    @Autowired
+    VerificationService verificationService;
+
     @Override
     public Provider extractProvider(Long serviceId) {
         Optional<Provider> providerOptional = providerService.findByServiceId(serviceId);
@@ -60,6 +63,10 @@ public class ExtractFieldServiceImpl implements ExtractFieldService {
         Optional<GenericParam> numberOptional = extractNumber(paramList);
         if (numberOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Number not found");
+        }
+
+        if (!verificationService.isValidLuhn(numberOptional.get().getParamValue())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid card number");
         }
 
         Optional<Wallet> walletOptional = walletService

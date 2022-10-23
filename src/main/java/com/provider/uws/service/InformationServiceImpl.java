@@ -18,9 +18,6 @@ public class InformationServiceImpl implements InformationService {
     @Autowired
     ExtractFieldService extractField;
 
-    @Autowired
-    VerificationService verificationService;
-
     @Override
     public GetInformationResult getInformation(GetInformationArguments arguments) {
         GetInformationResult result = new GetInformationResult();
@@ -30,7 +27,7 @@ public class InformationServiceImpl implements InformationService {
 
             Wallet wallet = extractField.extractWallet(arguments.getServiceId(), arguments.getParameters());
 
-            verificationService.checkPin(wallet, arguments.getParameters());
+            authenticationService.checkPin(wallet, arguments.getParameters());
 
             result.setStatus(200);
 

@@ -62,7 +62,7 @@ public class ProviderWebServiceEndpointTests {
                          
                          <parameters>
                             <paramKey>number</paramKey>
-                            <paramValue>+998917813126</paramValue>
+                            <paramValue>9990836456205582</paramValue>
                          </parameters>
                           <parameters>
                             <paramKey>pin</paramKey>
@@ -131,7 +131,7 @@ public class ProviderWebServiceEndpointTests {
                          
                          <parameters>
                             <paramKey>number</paramKey>
-                            <paramValue>+998917813126</paramValue>
+                            <paramValue>9990836456205582</paramValue>
                 	    </parameters>
                          <parameters>
                             <paramKey>pin</paramKey>

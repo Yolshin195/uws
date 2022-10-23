@@ -41,7 +41,7 @@ public class TransactionServiceImpl implements TransactionService {
 
             Wallet wallet = extractField.extractWallet(arguments.getServiceId(), arguments.getParameters());
 
-            verificationService.checkPin(wallet, arguments.getParameters());
+            authenticationService.checkPin(wallet, arguments.getParameters());
 
             Transaction transaction = transactionEntityService.save(
                     Transaction.builder()
