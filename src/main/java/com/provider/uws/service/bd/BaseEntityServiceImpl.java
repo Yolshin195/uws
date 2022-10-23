@@ -3,7 +3,9 @@ package com.provider.uws.service.bd;
 import com.provider.uws.model.BaseEntity;
 import com.provider.uws.repository.BaseEntityRepository;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 public class BaseEntityServiceImpl<T extends BaseEntity> implements BaseEntityService<T> {
@@ -22,6 +24,7 @@ public class BaseEntityServiceImpl<T extends BaseEntity> implements BaseEntitySe
     }
 
     @Override
+    @Transactional
     public T update(T entity) {
         entity.setUpdateTs(LocalDateTime.now());
         return repository.save(entity);
@@ -33,7 +36,7 @@ public class BaseEntityServiceImpl<T extends BaseEntity> implements BaseEntitySe
     }
 
     @Override
-    public T getById(UUID id) {
-        return null;
+    public Optional<T> findById(UUID id) {
+        return repository.findById(id);
     }
 }

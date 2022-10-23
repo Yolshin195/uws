@@ -6,6 +6,7 @@ import lombok.Setter;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Version;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -26,6 +27,7 @@ public abstract class BaseEntity {
     @Column(name = "create_ts")
     LocalDateTime createTs;
 
+    @Version
     @Column(name = "version")
     Integer version;
 }
