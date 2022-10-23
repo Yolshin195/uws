@@ -41,6 +41,10 @@ public class ExtractFieldServiceImpl implements ExtractFieldService {
 
     @Override
     public Customer extractCustomer(String phone) {
+        if (!verificationService.isValidPhone(phone)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid phone number");
+        }
+
         Optional<Customer> customerOptional = customerService
                 .findByPhone(phone);
         if (customerOptional.isEmpty()) {
