@@ -20,9 +20,6 @@ public class TransactionServiceImpl implements TransactionService {
     AuthenticationService authenticationService;
 
     @Autowired
-    VerificationService verificationService;
-
-    @Autowired
     WalletService walletService;
 
     @Autowired

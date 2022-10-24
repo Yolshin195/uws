@@ -6,9 +6,6 @@ import org.springframework.stereotype.Service;
 public class VerificationServiceImpl implements VerificationService {
 
     public boolean isValidPhone(String phoneNumber) {
-        if (phoneNumber.trim().length() > 15 && phoneNumber.trim().length() < 9) {
-            return false;
-        }
         if (!phoneNumber.trim().matches("[+]?998([\\(\\)0-9])+")) {
             return false;
         }
