@@ -6,11 +6,10 @@ import org.springframework.stereotype.Service;
 public class VerificationServiceImpl implements VerificationService {
 
     public boolean isValidPhone(String phoneNumber) {
-        if (!phoneNumber.trim().matches("[+]?998([\\(\\)0-9])+")) {
+        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
             return false;
         }
-
-        return true;
+        return phoneNumber.trim().matches("[+]?998([()0-9])+");
     }
 
     public boolean isValidLuhn(String value) {

@@ -89,7 +89,7 @@ insert into uws_provider (id, delete_ts, update_ts, create_ts, version, service_
 values ('85a9d2c4-7bfe-4170-a518-060eac846744', null, null, CURRENT_TIMESTAMP(), 1, 1, 'test');
 
 insert into uws_customer (id, delete_ts, update_ts, create_ts, version, phone, name)
-values ('98147ae6-695a-4a37-9d3a-36086244f1c5', null, null, CURRENT_TIMESTAMP(), 1, '+998917813126', 'test');
+values ('98147ae6-695a-4a37-9d3a-36086244f1c5', null, null, CURRENT_TIMESTAMP(), 1, '998917813126', 'test');
 
 insert into uws_wallet (id, delete_ts, update_ts, create_ts, version, pin, balance, virtual_wallet_number, provider_id, customer_id)
 values ('258223cf-e81c-4624-ab3e-443e6ebccfa3', null, null, CURRENT_TIMESTAMP(), 1, '123456', 0, '9990836456205582', '85a9d2c4-7bfe-4170-a518-060eac846744', '98147ae6-695a-4a37-9d3a-36086244f1c5');

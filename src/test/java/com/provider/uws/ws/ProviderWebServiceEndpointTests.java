@@ -2,6 +2,7 @@ package com.provider.uws.ws;
 
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.net.URI;
@@ -9,13 +10,19 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ProviderWebServiceEndpointTests {
+
+    private final Random random = new Random();
+
+    @Value("${local.server.port}")
+    private String port;
 
     @Test
     void getInformationTest() throws Exception {
@@ -30,7 +37,7 @@ public class ProviderWebServiceEndpointTests {
                          
                          <parameters>
                             <paramKey>phone</paramKey>
-                            <paramValue>+998917813126</paramValue>
+                            <paramValue>+998(91)7813126</paramValue>
                          </parameters>
                           <parameters>
                             <paramKey>pin</paramKey>
@@ -103,12 +110,12 @@ public class ProviderWebServiceEndpointTests {
                          </parameters>
                          
                          <serviceId>1</serviceId>
-                         <transactionId>15</transactionId>
+                         <transactionId>%s</transactionId>
                          <transactionTime>2022-10-23T16:50:32.748888800</transactionTime>
                       </uws:PerformTransactionArguments>
                    </soapenv:Body>
                 </soapenv:Envelope>
-                """;
+                """.formatted(random.nextLong());
 
         HttpResponse<String> response = sendPost(body);
 
@@ -139,12 +146,12 @@ public class ProviderWebServiceEndpointTests {
                          </parameters>
                          
                          <serviceId>1</serviceId>
-                         <transactionId>16</transactionId>
+                         <transactionId>%s</transactionId>
                          <transactionTime>2022-10-23T16:50:32.748888800</transactionTime>
                       </uws:PerformTransactionArguments>
                    </soapenv:Body>
                 </soapenv:Envelope>
-                """;
+                """.formatted(random.nextLong());
 
         HttpResponse<String> response = sendPost(body);
 
@@ -155,7 +162,7 @@ public class ProviderWebServiceEndpointTests {
 
     private HttpResponse<String> sendPost(String body) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/soap-api/service/test?wsdl"))
+                .uri(URI.create("http://localhost:"+port+"/soap-api/service/test?wsdl"))
                 .timeout(Duration.ofMinutes(1))
                 .header("Content-Type", "application/xml")
                 .POST(HttpRequest.BodyPublishers.ofString(body))

@@ -49,7 +49,7 @@ public class ExtractFieldServiceTests {
                 .build();
 
         this.customer = Customer.builder()
-                .phone("+998917813126")
+                .phone("+998(91)7813126")
                 .name("User1")
                 .build();
 
@@ -83,7 +83,7 @@ public class ExtractFieldServiceTests {
                 .thenReturn(Optional.of(provider));
 
         Mockito
-                .when(customerService.findByPhone(customer.getPhone()))
+                .when(customerService.findByPhone("998917813126"))
                 .thenReturn(Optional.of(customer));
 
         Mockito
@@ -130,6 +130,32 @@ public class ExtractFieldServiceTests {
         ResponseStatusException responseStatusException = assertThrows(ResponseStatusException.class, () ->
                 extractFieldService.extractWallet(provider, new ArrayList<>()));
         assertEquals(HttpStatus.BAD_REQUEST, responseStatusException.getStatus());
+    }
+
+    @Test
+    void extractWalletByNumberIsEmptyTest() {
+        GenericParam empty = new GenericParam();
+        empty.setParamKey("number");
+        empty.setParamValue("");
+        List<GenericParam> emptyNumberList = List.of(empty);
+
+        ResponseStatusException responseStatusException = assertThrows(ResponseStatusException.class, () ->
+                extractFieldService.extractWallet(provider, emptyNumberList));
+        assertEquals(HttpStatus.BAD_REQUEST, responseStatusException.getStatus());
+        assertEquals("Wallet number is empty", responseStatusException.getReason());
+    }
+
+    @Test
+    void extractWalletByNumberIsNotNumberTest() {
+        GenericParam empty = new GenericParam();
+        empty.setParamKey("number");
+        empty.setParamValue("null");
+        List<GenericParam> emptyNumberList = List.of(empty);
+
+        ResponseStatusException responseStatusException = assertThrows(ResponseStatusException.class, () ->
+                extractFieldService.extractWallet(provider, emptyNumberList));
+        assertEquals(HttpStatus.BAD_REQUEST, responseStatusException.getStatus());
+        assertEquals("Wallet number is not a number", responseStatusException.getReason());
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.provider.uws.*;
 import com.provider.uws.model.*;
 import com.provider.uws.service.bd.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -39,6 +40,10 @@ public class TransactionServiceImpl implements TransactionService {
             Wallet wallet = extractField.extractWallet(arguments.getServiceId(), arguments.getParameters());
 
             authenticationService.checkPin(wallet, arguments.getParameters());
+
+            if (transactionEntityService.isTransactionNotExist(arguments.getTransactionId())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Duplicate transaction");
+            }
 
             Transaction transaction = transactionEntityService.save(
                     Transaction.builder()

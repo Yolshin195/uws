@@ -45,8 +45,15 @@ public class ExtractFieldServiceImpl implements ExtractFieldService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid phone number");
         }
 
+        phone = phone.replaceAll("[()+]", "");
+
+        if (phone.length() != 12) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid phone number");
+        }
+
         Optional<Customer> customerOptional = customerService
                 .findByPhone(phone);
+
         if (customerOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Customer not found");
         }
@@ -67,6 +74,16 @@ public class ExtractFieldServiceImpl implements ExtractFieldService {
         Optional<GenericParam> numberOptional = extractNumber(paramList);
         if (numberOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Number not found");
+        }
+
+        String number = numberOptional.get().getParamValue().trim();
+
+        if (number.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wallet number is empty");
+        }
+
+        if (!number.matches("^\\d+$")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wallet number is not a number");
         }
 
         if (!verificationService.isValidLuhn(numberOptional.get().getParamValue())) {

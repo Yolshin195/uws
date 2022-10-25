@@ -17,31 +17,45 @@ public class ProviderWebServiceEndpoint implements ProviderWebService {
 
     @Override
     public GetStatementResult getStatement(GetStatementArguments arguments) {
-        return null;
+        return new GetStatementResult();
     }
 
     @Override
     public GetInformationResult getInformation(GetInformationArguments arguments) {
-        return informationService.getInformation(arguments);
+        try {
+            return informationService.getInformation(arguments);
+        } catch (Exception e) {
+            GetInformationResult result = new GetInformationResult();
+            result.setStatus(500);
+            result.setErrorMsg("External error!");
+            return result;
+        }
     }
 
     @Override
     public PerformTransactionResult performTransaction(PerformTransactionArguments arguments) {
-        return transactionService.perform(arguments);
+        try {
+            return transactionService.perform(arguments);
+        } catch (Exception e) {
+            PerformTransactionResult result = new PerformTransactionResult();
+            result.setStatus(500);
+            result.setErrorMsg("External error!");
+            return result;
+        }
     }
 
     @Override
     public CheckTransactionResult checkTransaction(CheckTransactionArguments arguments) {
-        return null;
+        return new CheckTransactionResult();
     }
 
     @Override
     public CancelTransactionResult cancelTransaction(CancelTransactionArguments arguments) {
-        return null;
+        return new CancelTransactionResult();
     }
 
     @Override
     public ChangePasswordResult changePassword(ChangePasswordArguments arguments) {
-        return null;
+        return new ChangePasswordResult();
     }
 }
