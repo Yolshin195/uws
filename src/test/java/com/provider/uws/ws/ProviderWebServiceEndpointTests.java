@@ -162,7 +162,7 @@ public class ProviderWebServiceEndpointTests {
 
     private HttpResponse<String> sendPost(String body) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:"+port+"/soap-api/service/test?wsdl"))
+                .uri(URI.create("http://localhost:"+port+"/soap-api/uws?wsdl"))
                 .timeout(Duration.ofMinutes(1))
                 .header("Content-Type", "application/xml")
                 .POST(HttpRequest.BodyPublishers.ofString(body))

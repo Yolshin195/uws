@@ -59,7 +59,7 @@ public class ApplicationConfig {
     public Endpoint endpoint(Bus bus, ProviderWebServiceEndpoint providerWebServiceEndpoint) {
 
         EndpointImpl endpoint = new EndpointImpl(bus, providerWebServiceEndpoint);
-        endpoint.publish("/service/test");
+        endpoint.publish("/uws");
 
         return endpoint;
     }
