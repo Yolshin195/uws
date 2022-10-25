@@ -30,8 +30,8 @@
             <username>user</username>
             <amount>300000</amount>
             <parameters>
-                <paramKey>number</paramKey>
-                <paramValue>9990836456205582</paramValue>
+                <paramKey>phone</paramKey>
+                <paramValue>+998(91)7813126</paramValue>
             </parameters>
             <parameters>
                 <paramKey>pin</paramKey>
