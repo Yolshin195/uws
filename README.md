@@ -10,6 +10,16 @@
     http://localhost:8080/soap-api/uws?wsdl
 `
 
+### Run server
+```#!bash
+    $ ./mvnw spring-boot:run
+```
+
+### Run tests
+```#!bash
+    $ ./mvnw test
+```
+
 ### Example performTransaction
 
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:uws="http://uws.provider.com/">
