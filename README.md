@@ -11,7 +11,6 @@
 `
 
 ### Example performTransaction
-`
 
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:uws="http://uws.provider.com/">
     <soapenv:Header/>
@@ -36,10 +35,8 @@
     </soapenv:Body>
     </soapenv:Envelope>
 
-`
 
 ### Example getInformation
-`
 
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:uws="http://uws.provider.com/">
        <soapenv:Header/>
@@ -61,5 +58,3 @@
           </uws:GetInformationArguments>
        </soapenv:Body>
     </soapenv:Envelope>
-
-`
